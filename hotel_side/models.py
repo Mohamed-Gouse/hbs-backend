@@ -151,7 +151,7 @@ class Booking(models.Model):
     booking_id = models.CharField(max_length=1000, null=True, blank=True)
 
     def __str__(self):
-        return f"{self.full_name} - {self.booking_id}"
+        return f"{self.full_name} - {self.hotel.name}"
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  

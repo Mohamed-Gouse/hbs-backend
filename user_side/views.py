@@ -1,5 +1,5 @@
 from .serializers import BookingSerializer, HotelSerializer, CheckAvailabilitySerializer, RoomSerializer, SelectionListSerializer, UserSerializer, WishlistSerializer
-from hotel_side.models import Hotel, Room, Room_type, Booking
+from hotel_side.models import Hotel, Room, Room_type, Booking, Reservation
 from interactions.models import Selections, Wishlist
 from rest_framework import viewsets, permissions, generics, status
 from django.shortcuts import get_object_or_404
@@ -26,14 +26,11 @@ class CheckAvailabilityView(generics.GenericAPIView):
         room_type_id = serializer.validated_data['room_type_id']
         guests = serializer.validated_data['guests']
 
-        # Check if room type exists
         room_type = get_object_or_404(Room_type, id=room_type_id)
 
-        # Check if guests fit in the room type
         if guests > room_type.room_capacity:
             return Response({"error": "Number of guests exceeds room capacity."}, status=status.HTTP_400_BAD_REQUEST)
         
-         # Check that check-in date is before check-out date and there's at least one day difference
         if check_in >= check_out:
             return Response({"error": "Check-out date must be after check-in date."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -43,17 +40,24 @@ class CheckAvailabilityView(generics.GenericAPIView):
         if check_in < date.today():
             return Response({"error": "Check-in date must be today or a future date."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Get all rooms of the selected room type
         rooms = Room.objects.filter(room_type=room_type, is_available=True)
 
-        # Check for each room if it is available during the selected dates
         available_rooms = []
         for room in rooms:
-            if not Booking.objects.filter(
+            print(Booking.objects.filter(rooms=room, check_in_date=check_in).exists())
+            is_booked_or_reserved = Booking.objects.filter(
+                rooms=room,
+                check_in_date=check_in,
+                check_out_date=check_out,
+            ).exists() or Reservation.objects.filter(
                 room=room,
-                check_in_date__lt=check_out,
-                check_out_date__gt=check_in,
-            ).exists():
+                check_in_date__gte=check_in,
+                check_out_date__lte=check_out,
+            ).exists()
+
+            print(is_booked_or_reserved)
+
+            if not is_booked_or_reserved:
                 available_rooms.append(room)
 
         if available_rooms:
@@ -64,7 +68,6 @@ class CheckAvailabilityView(generics.GenericAPIView):
             }, status=status.HTTP_200_OK)
 
         return Response({"error": "No available rooms for the selected dates."}, status=status.HTTP_400_BAD_REQUEST)
-    
 
 class ListSelections(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
