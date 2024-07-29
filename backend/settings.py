@@ -8,7 +8,7 @@ SECRET_KEY = 'django-insecure-kimexex^lhhv7i^)x$z-c0_sjcmytewv%c(sxr-_26@n&sby=5
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["http://16.171.240.169", "*"]
 
 CORS_ALLOW_ALL_ORIGINS = True
 
