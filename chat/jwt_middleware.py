@@ -1,11 +1,11 @@
 from channels.middleware import BaseMiddleware
 from channels.db import database_sync_to_async
-from django.contrib.auth.models import AnonymousUser
 import jwt
 from django.conf import settings
 
 @database_sync_to_async
 def get_user(token):
+    from django.contrib.auth.models import AnonymousUser
     try:
         from auth_app.models import Accounts
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
@@ -17,6 +17,7 @@ def get_user(token):
 
 class JWTAuthMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
+        from django.contrib.auth.models import AnonymousUser
         headers = dict(scope['headers'])
         token = headers.get(b'sec-websocket-protocol', None)
         if token:
