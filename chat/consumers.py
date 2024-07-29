@@ -2,11 +2,11 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.db.models import Q
-from django.apps import apps
-Message = apps.get_model('chat', 'Message')
-Accounts = apps.get_model('auth_app', 'Accounts')
-# from .models import Message
-# from auth_app.models import Accounts
+# from django.apps import apps
+# Message = apps.get_model('chat', 'Message')
+# Accounts = apps.get_model('auth_app', 'Accounts')
+from .models import Message
+from auth_app.models import Accounts
 
 
 
