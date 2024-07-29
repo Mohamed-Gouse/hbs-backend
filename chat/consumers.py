@@ -2,13 +2,6 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from django.db.models import Q
-# from django.apps import apps
-# Message = apps.get_model('chat', 'Message')
-# Accounts = apps.get_model('auth_app', 'Accounts')
-from .models import Message
-from auth_app.models import Accounts
-
-
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -75,10 +68,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def save_message(self, sender, receiver, message):
+        from chat.models import Message
         Message.objects.create(sender=sender, receiver=receiver, messages=message)
 
     @database_sync_to_async
     def get_past_messages(self):
+        from chat.models import Message
         messages = Message.objects.filter(
             (Q(sender=self.user) & Q(receiver=self.room_name)) | 
             (Q(receiver=self.user) & Q(sender=self.room_name))
@@ -87,5 +82,5 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def get_user(self, username):
+        from auth_app.models import Accounts
         return Accounts.objects.get(username=username)
-    
