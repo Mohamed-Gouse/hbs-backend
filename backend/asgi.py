@@ -8,9 +8,7 @@ from chat.jwt_middleware import JWTAuthMiddleware
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 
-# application = get_asgi_application()
-
 application = ProtocolTypeRouter({
-    "http": application,
+    "http": get_asgi_application(),
     "websocket": JWTAuthMiddleware(AuthMiddlewareStack(URLRouter(websocket_urlpatterns)))
 })
