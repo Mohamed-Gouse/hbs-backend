@@ -2,6 +2,7 @@ from django.db import models
 from auth_app.models import Accounts
 import shortuuid
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError
 
 # Create your models here.
 STATUS_CHOICES = [
@@ -129,7 +130,7 @@ class FAQ(models.Model):
 class Booking(models.Model):
     user = models.ForeignKey(Accounts, on_delete=models.SET_NULL, null=True, blank=True)
     hotel = models.ForeignKey(Hotel, on_delete=models.SET_NULL, null=True, blank=True)
-    room = models.ForeignKey(Room, on_delete=models.SET_NULL, null=True, blank=True)
+    rooms = models.ManyToManyField(Room)
     full_name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
@@ -151,9 +152,15 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.full_name} - {self.booking_id}"
-    
-    def rooms(self):
-        return self.room.all().count()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  
+        if 'rooms' in kwargs:
+            self.rooms.set(kwargs.pop('rooms'))
+
+    @property
+    def room_count(self):
+        return self.rooms.count()
 
 class Reservation(models.Model):
     user = models.ForeignKey(Accounts, on_delete=models.SET_NULL, null=True, blank=True)

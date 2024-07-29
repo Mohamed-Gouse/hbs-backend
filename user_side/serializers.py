@@ -73,7 +73,7 @@ class BookedHotelSerializer(serializers.ModelSerializer):
 
 class BookingSerializer(serializers.ModelSerializer):
     hotel = BookedHotelSerializer(read_only=True)
-    room = RoomSerializer(read_only=True)
+    rooms = RoomSerializer(read_only=True, many=True)
     class Meta:
         model = Booking
         fields = '__all__'
