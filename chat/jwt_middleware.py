@@ -3,7 +3,9 @@ from channels.db import database_sync_to_async
 from django.contrib.auth.models import AnonymousUser
 import jwt
 from django.conf import settings
-from auth_app.models import Accounts
+# from auth_app.models import Accounts
+from django.apps import apps
+Accounts = apps.get_model('auth_app', 'Accounts')
 
 @database_sync_to_async
 def get_user(token):
