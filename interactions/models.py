@@ -32,7 +32,10 @@ class Selections(models.Model):
         if self.status == 'active':
             active_selections = Selections.objects.filter(user=self.user, status='active').exclude(pk=self.pk)
             if active_selections.exists():
-                raise ValidationError("You already have an active selection. Complete the payment or cancel the current selection to make a new one.")
+                if self.hotel and active_selections.exclude(hotel=self.hotel).exists():
+                    raise ValidationError("You can only select rooms from the same hotel.")
+                if not self.hotel:
+                    raise ValidationError("Hotel must be specified for new selections.")
 
         super().save(*args, **kwargs)
 

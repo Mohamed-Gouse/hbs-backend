@@ -3,7 +3,7 @@ from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
 from .serializers import WishlistSerializer, SelectionSerializer, BookingSerializer, ReviewSerializer
 from .models import Wishlist, Selections, Review
-from hotel_side.models import Hotel, Booking
+from hotel_side.models import Hotel, Booking, Room
 from django.core.exceptions import ValidationError
 import stripe
 import shortuuid
@@ -47,6 +47,17 @@ class SelectionView(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         user = request.user
         room_id = request.data.get('room')
+        try:
+            room = Room.objects.get(id=room_id)
+        except Room.DoesNotExist:
+            return Response({'detail': 'Room does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the user has another active selection
+        active_selections = Selections.objects.filter(user=user, status='active')
+        if active_selections.exists():
+            # Ensure the room's hotel is the same as the one of active selections
+            if active_selections.exclude(hotel=room.hotel).exists():
+                return Response({'detail': 'You can only select rooms from the same hotel.'}, status=status.HTTP_400_BAD_REQUEST)
 
         if Selections.objects.filter(user=user, room_id=room_id).exists():
             return Response({'detail': 'Room already in selection'}, status=status.HTTP_400_BAD_REQUEST)
