@@ -44,7 +44,6 @@ class CheckAvailabilityView(generics.GenericAPIView):
 
         available_rooms = []
         for room in rooms:
-            print(Booking.objects.filter(rooms=room, check_in_date=check_in).exists())
             is_booked_or_reserved = Booking.objects.filter(
                 rooms=room,
                 check_in_date=check_in,
@@ -54,8 +53,6 @@ class CheckAvailabilityView(generics.GenericAPIView):
                 check_in_date__gte=check_in,
                 check_out_date__lte=check_out,
             ).exists()
-
-            print(is_booked_or_reserved)
 
             if not is_booked_or_reserved:
                 available_rooms.append(room)
