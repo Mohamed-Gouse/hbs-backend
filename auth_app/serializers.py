@@ -2,11 +2,11 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from .models import Accounts
 from django.contrib.auth.password_validation import validate_password
-# from django.contrib.auth.tokens import default_token_generator
-# from django.utils.encoding import force_bytes
-# from django.utils.http import urlsafe_base64_encode
-# from django.conf import settings
-# from .tasks import send_verification
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from django.conf import settings
+from .tasks import send_verification_email
 
 class AccountSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True, required=True)
@@ -29,20 +29,20 @@ class AccountSerializer(serializers.ModelSerializer):
             username=validated_data['username'],
             email=validated_data['email'],
             role=validated_data['role'],
-            is_active=True,
+            is_active=False,
         )
         user.set_password(validated_data['password'])
         user.save()
 
-        # token_generator = default_token_generator
-        # uid = urlsafe_base64_encode(force_bytes(user.pk))
-        # token = token_generator.make_token(user)
-        # verification_url = f"{settings.BASE_URL}/account/verify/{uid}/{token}"
+        token_generator = default_token_generator
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = token_generator.make_token(user)
+        verification_url = f"{settings.BASE_URL}api/verify/{uid}/{token}"
 
-        # subject = f"Verification mail from HMS portal."
-        # message = f"{user.full_name} your account is created successfully. Kindly please verify your account with below provided link. \n\nVerification link: {verification_url} \n\nFor more query contact us through mail {settings.EMAIL_HOST_USER}."
+        subject = f"Verification mail from HMS portal."
+        message = f"{user.full_name} your account is created successfully. Kindly please verify your account with below provided link. \n\nVerification link: {verification_url} \n\nFor more query contact us through mail {settings.EMAIL_HOST_USER}."
 
-        # send_verification.delay(subject, message, settings.EMAIL_HOST_USER, [user.email])
+        send_verification_email(subject, message, [user.email])
 
         return user
     
