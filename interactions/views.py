@@ -121,8 +121,8 @@ class BookingViewSet(viewsets.ModelViewSet):
                     'quantity': 1,
                 }],
                 mode='payment',
-                success_url='http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}',
-                cancel_url='http://localhost:5173/',
+                success_url='https://hotel-booking-system-v1n6.onrender.com/success?session_id={CHECKOUT_SESSION_ID}',
+                cancel_url='https://hotel-booking-system-v1n6.onrender.com/',
             )
             booking.payment_intent = session.payment_intent
             booking.booking_id = f"booking_{booking.id}"

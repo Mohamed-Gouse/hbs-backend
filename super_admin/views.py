@@ -3,6 +3,9 @@ from rest_framework.views import APIView
 from rest_framework import generics, permissions, viewsets
 from hotel_side .models import Hotel, STATUS_CHOICES
 from hotel_side.serializers import HotelSerializer, HotelStatusSerializer
+from .serializers import UserSerializer
+from auth_app.models import Accounts
+from django.db.models import Q
 
 
 class HotelsList(generics.ListAPIView):
@@ -26,3 +29,8 @@ class HotelStatusUpdateView(generics.RetrieveUpdateAPIView):
     queryset = Hotel.objects.all()
     serializer_class = HotelStatusSerializer
     lookup_field = 'pk'
+
+class UserView(viewsets.ModelViewSet):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Accounts.objects.all().exclude(Q(is_superuser=True) | Q(role="admin"))

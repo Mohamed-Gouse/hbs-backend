@@ -1,9 +1,10 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import HotelsList, StatusChoicesView, HotelStatusUpdateView, HotelView
+from .views import HotelsList, StatusChoicesView, HotelStatusUpdateView, HotelView, UserView
 
 router = DefaultRouter()
 router.register(r'hotels', HotelView)
+router.register(r'users', UserView)
 
 
 urlpatterns = [

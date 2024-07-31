@@ -170,9 +170,12 @@ class ReservationCreateView(generics.CreateAPIView):
     serializer_class = ReservationSerializer
 
     def perform_create(self, serializer):
-        # email = serializer.validated_data['email']
-        # user = get_object_or_404(Accounts, )
-        user = self.request.user
+        email = serializer.validated_data.get('email')
+        if email:
+            user = get_object_or_404(Accounts, email=email)
+        else:
+            user = self.request.user
+        
         check_in_date = serializer.validated_data['check_in_date']
         check_out_date = serializer.validated_data['check_out_date']
         total_days = (check_out_date - check_in_date).days
@@ -182,7 +185,7 @@ class ReservationCreateView(generics.CreateAPIView):
             user=user,
             total_days=total_days,
             payment_status=payment_status
-        ) 
+        )
 
 
 class ReservationView(viewsets.ModelViewSet):
