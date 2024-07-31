@@ -107,7 +107,7 @@ class Room_type(models.Model):
 class Room(models.Model):
     hotel = models.ForeignKey(Hotel, on_delete=models.CASCADE, related_name='rooms')
     room_type = models.ForeignKey(Room_type, on_delete=models.CASCADE, related_name='rooms')
-    room_number = models.PositiveIntegerField()
+    room_number = models.CharField(max_length=5)
     is_available = models.BooleanField(default=True)
 
     class Meta:
