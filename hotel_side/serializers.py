@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Hotel, Document, Gallery, Feature, Room_type, Room, FAQ, Booking, Reservation
+from interactions.models import Review
+from auth_app.models import Accounts
 
 
 class DocumentSerializer(serializers.ModelSerializer):
@@ -66,4 +68,16 @@ class ReservationViewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reservation
+        fields = '__all__'
+
+class UserSerial(serializers.ModelSerializer):
+    class Meta:
+        model = Accounts
+        fields = ['id', 'username']
+
+class ReviewSerializer(serializers.ModelSerializer):
+    user = UserSerial(read_only=True)
+    hotel = HotelSerializer(read_only=True)
+    class Meta:
+        model = Review
         fields = '__all__'

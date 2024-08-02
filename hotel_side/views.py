@@ -3,10 +3,9 @@ from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
 from auth_app.models import Accounts
 from .models import Hotel, Document, Gallery, Feature, Room_type, Room, FAQ, Booking, Reservation
-from .serializers import HotelSerializer, DocumentSerializer, GallerySerializer, FeatureSerializer, RoomTypeSerializer, RoomSerializer, FAQSerializer, BookingSerializer, ReservationSerializer, ReservationViewSerializer
+from .serializers import HotelSerializer, DocumentSerializer, GallerySerializer, FeatureSerializer, RoomTypeSerializer, RoomSerializer, FAQSerializer, BookingSerializer, ReservationSerializer, ReservationViewSerializer, ReviewSerializer
 from rest_framework.decorators import action
-import shortuuid
-from interactions.models import Selections
+from interactions.models import Review
 import stripe
 
 stripe.api_key = 'sk_test_51PZB3hHUq15j5kNH49RUpBczC3FsAMxWhmAxvKgzNUn0aShp5TqNdQd6YMqMoTN5msIN8BgQ7M8Hss1bKW0heB3S00F1A3E21f'
@@ -215,3 +214,11 @@ class ReservationView(viewsets.ModelViewSet):
         booking.save()
         return Response({'status': f"what happend {status_message}"}, status=status.HTTP_200_OK)
 
+class HotelReviews(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ReviewSerializer
+    queryset = Review.objects.none()
+
+    def get_queryset(self):
+        return Review.objects.filter(hotel__user=self.request.user)
+    

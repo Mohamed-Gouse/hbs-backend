@@ -97,23 +97,23 @@ CHANNEL_LAYERS = {
     },
 }
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'hbsbackend',
-#         'USER': 'hbs_admin',
-#         'PASSWORD': 'hbs_admin#0141',
-#         'HOST': 'hbsbackend.cl26wcam0gp8.eu-north-1.rds.amazonaws.com',
-#         'PORT': '5432',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'hbsbackend',
+        'USER': 'hbs_admin',
+        'PASSWORD': 'hbs_admin#0141',
+        'HOST': 'hbsbackend.cl26wcam0gp8.eu-north-1.rds.amazonaws.com',
+        'PORT': '5432',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {

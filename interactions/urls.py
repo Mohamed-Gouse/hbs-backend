@@ -5,7 +5,7 @@ from .views import WishlistView, SelectionView, BookingViewSet, WriteReview
 router = DefaultRouter()
 router.register(r'wishlist', WishlistView)
 router.register(r'selection', SelectionView)
-router.register(r'bookings', BookingViewSet)
+router.register(r'bookings', BookingViewSet, basename='booking')
 
 urlpatterns = [
     path('user/', include(router.urls)),

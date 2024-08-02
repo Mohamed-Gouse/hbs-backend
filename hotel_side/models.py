@@ -134,7 +134,7 @@ class Booking(models.Model):
     full_name = models.CharField(max_length=100)
     email = models.CharField(max_length=100)
     phone = models.CharField(max_length=100)
-    payment_status = models.CharField(max_length=100, choices=PAYMENT_STATUS, default='paid')
+    payment_status = models.CharField(max_length=100, choices=PAYMENT_STATUS, default='pending')
     before_discount = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
     total = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
     saved = models.DecimalField(max_digits=9, decimal_places=2, default=0.00)
