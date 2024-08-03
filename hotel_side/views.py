@@ -7,6 +7,8 @@ from .serializers import HotelSerializer, DocumentSerializer, GallerySerializer,
 from rest_framework.decorators import action
 from interactions.models import Review
 import stripe
+from rest_framework.views import APIView
+from django.db.models import Sum
 
 stripe.api_key = 'sk_test_51PZB3hHUq15j5kNH49RUpBczC3FsAMxWhmAxvKgzNUn0aShp5TqNdQd6YMqMoTN5msIN8BgQ7M8Hss1bKW0heB3S00F1A3E21f'
 
@@ -222,3 +224,27 @@ class HotelReviews(viewsets.ModelViewSet):
     def get_queryset(self):
         return Review.objects.filter(hotel__user=self.request.user)
     
+class StatisticsAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        hotels_count = Hotel.objects.filter(user=user).count()
+        bookings_count = Booking.objects.filter(hotel__user=user).count()
+        reservations_count = Reservation.objects.filter(hotel__user=user).count()
+        customers_count = Booking.objects.filter(hotel__user=user).values('user').distinct().count()
+        profit = Booking.objects.filter(hotel__user=user).aggregate(total_profit=Sum('total'))['total_profit'] or 0
+        reviews_count = Review.objects.filter(hotel__user=user).count()
+        
+        statistics = {
+            'hotels_count': hotels_count,
+            'bookings_count': bookings_count,
+            'reservations_count': reservations_count,
+            'customers_count': customers_count,
+            'profit': profit,
+            'reviews_count': reviews_count,
+        }
+
+        print(statistics)
+        
+        return Response(statistics)

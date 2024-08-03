@@ -13,7 +13,6 @@ class ListHotels(viewsets.ModelViewSet):
     queryset = Hotel.objects.filter(status="approved")
     lookup_field = 'slug'
 
-
 class CheckAvailabilityView(generics.GenericAPIView):
     serializer_class = CheckAvailabilitySerializer
 
@@ -74,14 +73,12 @@ class ListSelections(viewsets.ModelViewSet):
     def get_queryset(self):
         return Selections.objects.filter(user=self.request.user)
     
-
 class UserView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSerializer
 
     def get_object(self):
         return self.request.user
-
 
 class UserEditView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -96,7 +93,6 @@ class UserEditView(generics.UpdateAPIView):
     def patch(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
 
-
 class BookingList(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = BookingSerializer
@@ -104,7 +100,6 @@ class BookingList(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Booking.objects.filter(user=self.request.user).order_by('-date')
-
 
 class WishlistView(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]

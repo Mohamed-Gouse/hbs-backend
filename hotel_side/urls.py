@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import HotelViewSet, DocumentViewSet, GalleryViewSet, FeatureViewSet, RoomTypeViewSet, RoomViewSet, FAQViewSet, BookingsViewAdmin, ReservationCreateView, ReservationView, HotelReviews
+from .views import HotelViewSet, DocumentViewSet, GalleryViewSet, FeatureViewSet, RoomTypeViewSet, RoomViewSet, FAQViewSet, BookingsViewAdmin, ReservationCreateView, ReservationView, HotelReviews, StatisticsAPIView
 
 router = DefaultRouter()
 router.register(r'hotels', HotelViewSet)
@@ -17,4 +17,5 @@ router.register(r'reviews', HotelReviews)
 urlpatterns = [
     path('admin/', include(router.urls)),
     path('admin/create-reservation/', ReservationCreateView.as_view(), name='create_reservation'),
+    path('admin/statistics/', StatisticsAPIView.as_view(), name='statistics'),
 ]
