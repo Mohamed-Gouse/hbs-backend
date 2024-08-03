@@ -1,7 +1,7 @@
 Booking check ✅
-Review 
+Review ✅
 Hotel - Social media
-Celery - Booking, Registeration
+Celery - Booking, Registeration ✅
 
 Loader in every page
 Payment to Admin

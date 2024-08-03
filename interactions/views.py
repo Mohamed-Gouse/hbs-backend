@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, permissions, status, generics
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
-from .serializers import WishlistSerializer, SelectionSerializer, BookingSerializer, ReviewSerializer
+from .serializers import WishlistSerializer, SelectionSerializer, BookingSerializer, ReviewSerializer, HotelSerializer
 from .models import Wishlist, Selections, Review
 from hotel_side.models import Hotel, Booking, Room
 from django.core.exceptions import ValidationError
@@ -11,9 +11,9 @@ from django.db.models import Q
 from backend.tasks import send_verification_email
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
-from django.conf import settings
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
+from geopy.distance import distance as geopy_distance
+# from channels.layers import get_channel_layer
+# from asgiref.sync import async_to_sync
 
 
 stripe.api_key = 'sk_test_51PZB3hHUq15j5kNH49RUpBczC3FsAMxWhmAxvKgzNUn0aShp5TqNdQd6YMqMoTN5msIN8BgQ7M8Hss1bKW0heB3S00F1A3E21f'
@@ -123,13 +123,12 @@ class BookingViewSet(viewsets.ModelViewSet):
                     'quantity': 1,
                 }],
                 mode='payment',
-                success_url='https://hotel-booking-system-v1n6.onrender.com/success?session_id={{CHECKOUT_SESSION_ID}}&booking_id={booking.id}',
-                cancel_url='https://hotel-booking-system-v1n6.onrender.com/',
+                success_url=f'http://localhost:5173/success?session_id={{CHECKOUT_SESSION_ID}}&booking_id={booking.id}',
+                cancel_url='http://localhost:5173/',
             )
             booking.payment_intent = session.payment_intent
             booking.booking_id = f"booking_{booking.id}"
             booking.save()
-            selection_instance = Selections.objects.filter(user=booking.user).delete()
 
             return {
                 "session_id": session.id,
@@ -178,6 +177,7 @@ class BookingViewSet(viewsets.ModelViewSet):
                 #     }
                 # )
 
+                selection_instance = Selections.objects.filter(user=booking.user).delete()
                 return Response({"status": "Payment confirmed and booking updated"}, status=status.HTTP_200_OK)
             else:
                 return Response({"error": "Payment not completed"}, status=status.HTTP_400_BAD_REQUEST)
@@ -193,3 +193,29 @@ class WriteReview(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)  
+
+@api_view(['GET'])
+def search_hotels(request):
+    query = request.GET.get('query', '')
+    user_lat = request.GET.get('latitude')
+    user_lon = request.GET.get('longitude')
+    
+    # Filter hotels based on the search query
+    hotels = Hotel.objects.filter(
+        Q(name__icontains=query) |
+        Q(description__icontains=query) |
+        Q(address__icontains=query) |
+        Q(city__icontains=query) |
+        Q(state__icontains=query) |
+        Q(country__icontains=query) |
+        Q(tags__icontains=query)
+    )
+    
+    # If latitude and longitude are provided, sort by proximity
+    if user_lat and user_lon:
+        user_location = (float(user_lat), float(user_lon))
+        hotels = sorted(hotels, key=lambda hotel: geopy_distance(
+            user_location, (hotel.latitude, hotel.longitude)).km)
+    
+    serializer = HotelSerializer(hotels, many=True)
+    return Response(serializer.data)
