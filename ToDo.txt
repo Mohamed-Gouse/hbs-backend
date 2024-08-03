@@ -15,5 +15,4 @@ Page not found issue
 handling room real time booking
 Implement email notifications
 
-Practical 3
-Theory 3"
+celery -A backend beat -l info 

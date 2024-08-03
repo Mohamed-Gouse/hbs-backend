@@ -3,7 +3,7 @@ from .models import Accounts
 from .serializers import AccountSerializer, LoginSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth import get_user_model
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
@@ -31,7 +31,7 @@ def verify_account(request, uidb64, token):
     if user is not None and default_token_generator.check_token(user, token):
         user.is_active = True
         user.save()
-        return HttpResponse("Your account has been successfully verified.")
+        return HttpResponseRedirect('http://localhost:5173/login')
     else:
         return HttpResponse("Invalid verification link.")
     

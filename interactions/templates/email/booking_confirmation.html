@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Booking Confirmation</title>
+</head>
+<body>
+    <h1>Booking Confirmation</h1>
+    <p>Dear {{ full_name }},</p>
+    <p>Thank you for your booking. Here are your booking details:</p>
+    <ul>
+        <li>Hotel: {{ hotel_name }}</li>
+        <li>Check-in Date: {{ check_in_date }}</li>
+        <li>Check-out Date: {{ check_out_date }}</li>
+        <li>Total Price: ${{ total_price }}</li>
+    </ul>
+    <p>We look forward to hosting you!</p>
+</body>
+</html>

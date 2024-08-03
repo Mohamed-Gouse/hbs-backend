@@ -8,6 +8,12 @@ from hotel_side.models import Hotel, Booking, Room
 from django.core.exceptions import ValidationError
 import stripe
 from django.db.models import Q
+from backend.tasks import send_verification_email
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 
 stripe.api_key = 'sk_test_51PZB3hHUq15j5kNH49RUpBczC3FsAMxWhmAxvKgzNUn0aShp5TqNdQd6YMqMoTN5msIN8BgQ7M8Hss1bKW0heB3S00F1A3E21f'
@@ -144,12 +150,40 @@ class BookingViewSet(viewsets.ModelViewSet):
             session = stripe.checkout.Session.retrieve(session_id)
             payment_intent = session.payment_intent
             
-            booking = get_object_or_404(Booking, id=booking_id)
-            booking.payment_status = 'paid'
-            booking.payment_intent = payment_intent
-            booking.save()
+            if session.payment_status == 'paid':
+                booking = Booking.objects.get(id=booking_id)
+                booking.payment_status = 'paid'
+                booking.payment_intent = payment_intent
+                booking.save()
+                
+                # Send email notification
+                context = {
+                    'full_name': booking.full_name,
+                    'hotel_name': booking.hotel.name,
+                    'check_in_date': booking.check_in_date,
+                    'check_out_date': booking.check_out_date,
+                    'total_price': booking.total
+                }
+                subject = 'Booking Confirmation'
+                html_message = render_to_string('email/booking_confirmation.html', context)
+                plain_message = strip_tags(html_message)
+                to = booking.email
+                
+                send_verification_email.delay(subject=subject, message=plain_message, recipient=[to], html_message=html_message)
 
-            return Response({'status': 'Payment confirmed and booking updated'}, status=status.HTTP_200_OK)
+                # channel_layer = get_channel_layer()
+                # async_to_sync(channel_layer.group_send)(
+                #     f"user_{booking.user.id}", 
+                #     {
+                #         "type": "send_notification",
+                #         "message": "Your booking has been confirmed and a confirmation email has been sent."
+                #     }
+                # )
+
+                return Response({"status": "Payment confirmed and booking updated"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Payment not completed"}, status=status.HTTP_400_BAD_REQUEST)
+        
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 

@@ -6,7 +6,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from django.conf import settings
-from .tasks import send_verification_email
+from backend.tasks import send_verification_email
 
 class AccountSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True, required=True)
@@ -42,7 +42,7 @@ class AccountSerializer(serializers.ModelSerializer):
         subject = f"Verification mail from HMS portal."
         message = f"{user.full_name} your account is created successfully. Kindly please verify your account with below provided link. \n\nVerification link: {verification_url} \n\nFor more query contact us through mail {settings.EMAIL_HOST_USER}."
 
-        send_verification_email(subject, message, [user.email])
+        send_verification_email.delay(subject, message, [user.email])
 
         return user
     
