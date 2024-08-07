@@ -8,7 +8,7 @@ SECRET_KEY = 'django-insecure-kimexex^lhhv7i^)x$z-c0_sjcmytewv%c(sxr-_26@n&sby=5
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["http://127.0.0.1:8000", "https://backend.jb-computers.shop"]
+ALLOWED_HOSTS = ["127.0.0.1:8000", "backend.jb-computers.shop"]
 
 BASE_URL = 'https://backend.jb-computers.shop/'
 
