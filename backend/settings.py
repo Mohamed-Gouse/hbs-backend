@@ -14,7 +14,7 @@ BASE_URL = 'https://backend.jb-computers.shop/'
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
-    'https://backend.jb-computers.shop'
+    'https://hotel-booking-system-v1n6.onrender.com'
 ]
 
 CORS_ALLOW_METHODS = (
