@@ -8,15 +8,13 @@ SECRET_KEY = 'django-insecure-kimexex^lhhv7i^)x$z-c0_sjcmytewv%c(sxr-_26@n&sby=5
 
 DEBUG = True
 
-ALLOWED_HOSTS = ["http://16.171.240.169", "*"]
+ALLOWED_HOSTS = ["http://127.0.0.1:8000", "https://backend.jb-computers.shop"]
 
-BASE_URL = 'https://16.171.240.169/'
-
-CORS_ALLOW_ALL_ORIGINS = True
+BASE_URL = 'https://backend.jb-computers.shop/'
 
 CORS_ALLOWED_ORIGINS = [
-    "https://hbs-z490.onrender.com",
     'http://localhost:5173',
+    'https://backend.jb-computers.shop'
 ]
 
 CORS_ALLOW_METHODS = (
